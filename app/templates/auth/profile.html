@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}XenonSwift | Profile{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>
+        {{ current_user.first_name }}'s Profile:
+    </h1>
+</div>
+
+<div class="col-md-4">
+    <form role="form" method="POST" action="">
+        <div class="form-group">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        </div>
+        {{ macros.render_field(form.username, disabled="true") }}
+        {{ macros.render_field(form.first_name, 
+                    help_text="First letter should be capitalized. Should contain only alphabets and spaces.") }}
+        {{ macros.render_field(form.last_name,
+                    help_text="First letter should be capitalized. Should contain only alphabets and spaces.") }}
+        {{ macros.render_field(form.email, disabled="true") }}
+        {{ form.submit(class="btn btn-danger") }}
+    </form>
+</div>
+{% endblock %}

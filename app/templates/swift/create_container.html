@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "macros.html" as macros %}
+
+{% block title %}XenonSwift | Create Container{% endblock %}
+{% block page_content %}
+<div class="page-header">
+    <h1>Create Container</h1>
+</div>
+<div class="col-md-4">
+    <form role="form" method="POST" action="">
+        <div class="form-group">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            {{macros.render_field(form.name, type='text', 
+                help_text="Only alphanumeric characters and underscores are allowed")}}
+            {{ form.submit(class="btn btn-danger")}}
+        </div>
+    </form>
+</div>
+{% endblock %}

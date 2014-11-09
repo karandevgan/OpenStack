@@ -1,0 +1,56 @@
+<div class="modal fade" id="{{'%sDetails' % i}}" tabindex="-1" role="dialog"
+aria-labelledby="{{'%sDetailsLabel' %i}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                </button>
+                <h3 class="modal-title" id="{{'%sDetails' % i}}">
+                {{container.get('name')}} Details</h3>
+            </div>
+            <div class="modal-body">
+                {% set container_size = (container.get('bytes')|float) %}
+                {% set size_type = 'Bytes' %}
+                {% if container_size > 1024 ** 3 %}
+                    {% set container_size = container_size / 1024 ** 3 %}
+                    {% set size_type = 'GB' %}
+                {% elif container_size > 1024 ** 2 %}
+                    {% set container_size = container_size / 1024 ** 2 %}
+                    {% set size_type = 'MB' %}    
+                {% elif container_size > 1024 %}
+                    {% set container_size = container_size / 1024 %}
+                    {% set size_type = 'KB' %}
+                {% endif %}
+                <p><b>Total objects: </b>{{container.get('count')}}<br>
+                <p><b>Size of container: </b>{{'%0.2f %s' % (container_size, size_type)}}<br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="{{'%sDelete' % i}}" tabindex="-1" role="dialog"
+aria-labelledby="{{'%sDeleteLabel' % i}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                </button>
+                <h3 class="modal-title" id="{{'%sDelete' % i }}">
+                Delete {{container.get('name')}}?</h3>
+            </div>
+            <div class="modal-body">
+                <h4>Are you sure you want to DELETE this container?</h4>
+            </div>
+            <div class="modal-footer">
+                <a href="{{url_for('swift.container',
+                        path=container.get('name') + '/', delete='yes')}}" 
+                    class="btn btn-danger">Yes</a>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>

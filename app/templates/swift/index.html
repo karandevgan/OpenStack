@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}
+    XenonSwift | Main Page
+{% endblock %}
+
+{% block topmenu %}
+<li class="dropdown">
+    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+        Create <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu">
+        <li><a href="{{ url_for('swift.create_container') }}">Container</a>
+    </ul>
+</li>
+{% endblock %}
+
+{% block bread_crumbs %}
+    <ul class="breadcrumb">
+        <li class="active">Home</li>
+    </ul>
+{% endblock %}
+
+{% block page_content %}
+    {% set account_size = Account.get('total_size') %}
+    {% set progress_value = (account_size / 5368709120) * 100 %}
+    <div>
+        <p> Total space used: {{progress_value|int}}%</p>
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" aria-valuenow="{{progress_value}}" aria-valuemin="0" aria-valuemax="100"
+            style="width: {{progress_value}}%;">
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+             <h3 class="panel-title">Object Store</h3>
+        </div>
+        <div class="panel-body">
+            {% if Account.get('containers')|length %}
+                {% set size_type = 'Bytes' %}
+                {% if account_size > 1024 ** 3 %}
+                    {% set account_size = account_size / 1024 ** 3 %}
+                    {% set size_type = 'GB' %}
+                {% elif account_size > 1024 ** 2 %}
+                    {% set account_size = account_size / 1024 ** 2 %}
+                    {% set size_type = 'MB' %}    
+                {% elif account_size > 1024 %}
+                    {% set size_type = 'KB' %}
+                    {% set account_size = account_size / 1024 %}
+                {% endif %}
+                <div class="row">
+                    <div class="col-md-3 col-sm-4">
+                        <p>Total size: {{'%0.2f %s' % (account_size, size_type) }}</p>
+                    </div>
+                    <div class="col-md-3 col-sm-4">
+                        <p>Number of containers: {{Account.get('containers')|length}}</p>
+                    </div>
+                    <div class="col-md-3 col-sm-4"> 
+                        <p>Number of objects: {{Account.get('number_of_objects')}}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    {% for container in Account.get('containers') %}
+                        {% set i = 0 %}
+                        {% set i = i+1 %}
+                        {% include "swift/display_container.html" %}
+                        {% include "swift/container_modal.html" %}
+                    {% endfor %}
+                </div>
+            {% else %}
+            <p>Your object storage is empty and has no containers.</p>
+            {% endif %}
+    
+        </div>
+    </div>
+{% endblock %}

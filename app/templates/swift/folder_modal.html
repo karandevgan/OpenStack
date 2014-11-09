@@ -1,0 +1,44 @@
+<div class="modal fade" id="{{'%sDetails' % folder_name}}" tabindex="-1" role="dialog" 
+    aria-labelledby="{{'%sDetailsLabel' % folder_name}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                </button>
+                <h3 class="modal-title" id="{{'%sDetailsLabel' % folder_name}}">
+                {{folder_name}} Details</h3>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="{{'%sDelete' % folder_name}}" tabindex="-1" role="dialog"
+    aria-labelledby="{{'%sDeleteLabel' % folder_name}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                </button>
+                <h3 class="modal-title" id="{{'%sDelete' % folder_name}}">
+                Delete {{folder_name}}?</h3>
+            </div>
+            <div class="modal-body">
+                <h4>Are you sure you want to DELETE this folder?</h4>
+            </div>
+            <div class="modal-footer">
+                <a href="{{url_for('swift.container',
+                        path=folder_path, delete='yes')}}" 
+                    class="btn btn-danger">Yes</a>
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>

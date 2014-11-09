@@ -1,0 +1,39 @@
+<div class="col-md-2 col-sm-2 col-xs-5">
+    <div class="thumbnail">
+        <div class="bg-warning">
+            <a href="{{url_for('swift.container', path=folder_path)}}">
+                <img src="{{url_for('static', filename='images/swift/folder.png', _external=True)}}">
+            </a>
+            <div class="caption">
+                <center>
+                <div class="btn-group">
+                    <a href="{{url_for('swift.container', path=folder_path)}}">
+                        {% if (folder_name|length) > 7 %}
+                            {{folder_name[:8]}}..
+                        {% else %}
+                            {{folder_name}}
+                        {% endif %}
+                    </a>
+                    <a data-toggle="dropdown">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li>
+                            <a href="javascript:void(0);" data-toggle="modal" data-target="{{'#%sDetails' % folder_name}}">
+                                View Information
+                            </a>
+                        </li>
+                        <li><a href="javaScript:void(0);">Another action</a></li>
+                        <li><a href="javaScript:void(0);">Something else here</a></li>
+                        <li class="divider"></li>
+                        <li><a href="javascript:void(0);" data-toggle="modal" data-target="{{'#%sDelete' % folder_name}}">
+                            Delete</a>
+                        </li>
+                    </ul>
+                </div>
+                </center>
+            </div>
+        </div>
+    </div>
+</div>

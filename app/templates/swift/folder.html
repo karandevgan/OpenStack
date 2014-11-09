@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% set folder_name = folders[-1] %}
+{% block title %}
+    XenonSwift | {{folder_name}}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript">
+    function showCheckBoxes()
+    {
+        labelArray = document.getElementsByName("selectLabel")
+        for (var i=0; i < labelArray.length; i++)
+        {
+            labelArray[i].style="display:inline;";
+        }
+
+        document.getElementById("DeleteButtons").style="display:inline;"
+    }
+
+    function hideCheckBoxes()
+    {
+        labelArray = document.getElementsByName("selectLabel")
+        for (var i=0; i < labelArray.length; i++)
+        {
+            labelArray[i].style="display:none;";
+        }
+
+        document.getElementById("DeleteButtons").style="display:none;"   
+    }
+</script>
+{% endblock %}
+
+{% block topmenu %}
+<li class="dropdown">
+    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+        Create <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu">
+        <li><a href="{{ url_for('swift.create_container') }}">Container</a>
+        <li><a href="{{ url_for('swift.create_folder', path=upload_path) }}">Folder</a></li>
+    </ul>
+</li>
+
+<li><a href="{{ url_for('swift.upload', path=upload_path) }}">Upload</a></li>
+{% endblock %}
+
+{% block bread_crumbs %}
+    <ul class="breadcrumb">
+        <li><a href="{{url_for('swift.account')}}">Home</a></li>
+        <li><a href="{{url_for('swift.container', path=container_name + '/')}}">{{container_name}}</a></li>
+        {% set temp_path=container_name + '/' %}
+        {% for folder in folders[:-1] %}
+            {% set temp_path= temp_path + folder + '/' %}
+            <li><a href="{{url_for('swift.container', path=temp_path)}}">{{folder}}</a></li>
+        {% endfor %}
+        <li class="active">{{folder_name}}</li>
+    </ul>
+{% endblock %}
+
+{% block page_content %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{folder_name}}</h3>
+        </div>
+        
+        <div class="panel-body">
+            <div id="DeleteButtons" style="display:none;">
+                <input type="button" class="btn btn-danger" value="Delete All" />
+                <input type="button" class="btn btn-default" value="Cancel" onclick="hideCheckBoxes();" />
+                <br><br>
+            </div>
+        {% set number_of_objects=(folder_list|length) + (object_list|length) %}
+        {% if number_of_objects %}            
+            <div class="row">
+            {% set i = 0 %}
+            {% for folder in folder_list %}
+                {% set folder_path = container_name + '/' + folder.get('subdir') %}
+                {% set folder_name = folder.get('subdir')[folder.get('subdir')[:-1].rfind('/')+1:-1] %}
+                {% include "swift/display_folder.html" %}
+                {% include "swift/folder_modal.html" %}                
+            {% endfor %}
+            </div>
+            
+            <div class="row">
+            {% set i = 0 %}
+            {% for object in object_list %}
+                {% set object_path = container_name + '/' + object.get('name') %}
+                {% set object_name = object.get('name')[object.get('name').rfind('/')+1:] %}
+                {% include "swift/display_object.html" %}
+                {% include "swift/object_modal.html" %}                
+            {% endfor %}
+            </div>
+        {% else %}
+        <p>This folder is empty.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

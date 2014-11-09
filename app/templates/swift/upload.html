@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "macros.html" as macros %}
+
+{% block title %}XenonSwift | Upload{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript">
+    function checkFile()
+    {
+        var extensions_not_allowed = ["action","apk","app","bat","bin","cmd","com","command","cpl","csh","exe","gadget","inf","ins","inx","ipa","isu","job","jse","ksh","lnk","msc","msi","msp","mst","osx","out","paf","pif","prg","ps1","reg","rgs","run","sct","shb","shs","u3p","vb","vbe","vbs","vbscript","workflow","ws","wsf"]
+        
+        input = document.getElementById('file');
+        file = input.files[0];
+        if (file.size > 1073741824)
+        {
+            alert('File size is larger than required.')
+            return false
+        }
+
+        var extension = file.name.split('.').pop().toLowerCase();
+        for (var i=0; i < extensions_not_allowed.length; i++)
+        {
+            if (extensions_not_allowed[i] === extension)
+            {
+                alert('Direct upload of this file is not allowed')
+                return false
+            }
+        }
+    }
+</script>
+{% endblock %}
+
+{% block topmenu %}
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        Create <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu">
+        <li><a href="{{ url_for('swift.create_container') }}">Container</a>
+    </ul>
+</li>
+{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Upload</h1>
+</div>
+<div class="alert alert-warning">
+    <strong>Warning!</strong> You must set your secret key before uploading object using this form. Ignore if already set,
+    otherwise, <a href="#" data-toggle="modal" data-target="#SetKey">Click here.</a>
+</div>
+
+<div class="modal fade" id="SetKey" tabindex="-1" role="dialog" aria-labelledby="SetKeyLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                </button>
+                <h3 class="modal-title" id="SetKey">Set Secret Key</h3>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">Previous key will be replaced.</div>
+                <form role="form" method="POST" action="" id="secret_key_form">
+                    <div class="form-group">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    </div>
+                    {{macros.render_field(secret_key_form.key, type='password', 
+                        help_text="Minimum length should be of 5 characters.")}}
+                    {{ secret_key_form.submit(class="btn btn-danger")}}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6">
+    {% if has_key %}
+    <form role="form" id="upload_file" method="post" action='{{upload_path}}' enctype="multipart/form-data"
+        onsubmit="return checkFile();">
+        <div class="form-group">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        </div>
+        <div class="form-group">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="redirect" value="{{redirect_path}}" />
+            <input type="hidden" name="max_file_size" value="1073741824" />
+            <input type="hidden" name="max_file_count" value="1" />
+            <input type="hidden" name="expires" value="{{timestamp}}" />
+            <input type="hidden" name="signature" value="{{hmackey}}" />
+            <input type="hidden" name="x_detect_content_type" value="true" />
+            <input type="hidden" name="transfer-encoding" value="chunked" />
+        </div>
+        
+        <div class="form-group">
+            <label for="file">Select a file</label>
+            <input id="file" name="file" type="file" class="form-control" />
+            <p class="help-block">File size should not be greater than 1 GB.<br>
+            Direct upload of executable files is not allowed.</p>
+        </div>
+            <button id="submit" type="submit" class="btn btn-danger">Submit</button>
+    </form>
+    {% else %}
+        <p>Please Set Key First!</p>
+    {% endif %}
+</div>
+{% endblock %}
