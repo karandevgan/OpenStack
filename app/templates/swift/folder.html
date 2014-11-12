@@ -38,11 +38,20 @@
     </a>
     <ul class="dropdown-menu">
         <li><a href="{{ url_for('swift.create_container') }}">Container</a>
-        <li><a href="{{ url_for('swift.create_folder', path=upload_path) }}">Folder</a></li>
+        <li><a href="{{ url_for('swift.create_folder', path=current_path) }}">Folder</a></li>
     </ul>
 </li>
 
-<li><a href="{{ url_for('swift.upload', path=upload_path) }}">Upload</a></li>
+<li><a href="{{ url_for('swift.upload', path=current_path) }}">Upload</a></li>
+
+<li class="dropdown">
+    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+    More <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu">
+        <li><a href="javascript:void(0);" onclick="showCheckBoxes();">Multiple Delete</a></li>
+    </ul>
+</li>
 {% endblock %}
 
 {% block bread_crumbs %}
@@ -65,8 +74,10 @@
         </div>
         
         <div class="panel-body">
+        <form method="post" action="{{url_for('swift.bulk_delete', next=current_path)}}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <div id="DeleteButtons" style="display:none;">
-                <input type="button" class="btn btn-danger" value="Delete All" />
+                <input type="submit" class="btn btn-danger" value="Delete All" />
                 <input type="button" class="btn btn-default" value="Cancel" onclick="hideCheckBoxes();" />
                 <br><br>
             </div>
@@ -94,6 +105,7 @@
         {% else %}
         <p>This folder is empty.</p>
         {% endif %}
+        </form>
     </div>
 </div>
 {% endblock %}

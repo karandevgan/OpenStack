@@ -6,8 +6,8 @@ class Config:
     SECRET_KEY = os.urandom(32)
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
-    MAIL_SUBJECT_PREFIX = '[OpenStack]'
-    MAIL_SENDER = 'OpenStack Admin <test@example.com>'
+    MAIL_SUBJECT_PREFIX = '[XenonSwift]'
+    MAIL_SENDER = 'XenonSwift Admin <test@example.com>'
     #Clears the session after 30 seconds of inactivity
     PERMANENT_SESSION_LIFETIME = timedelta(seconds=3000)
 
@@ -43,6 +43,7 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
+                        'postgres://ljotzwznkfbbsj:fijRfOburSbGK_gNpg90_3Zmds@ec2-54-83-196-7.compute-1.amazonaws.com:5432/dan7osdgq6ca7r' or \
                         'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
 
 

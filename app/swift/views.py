@@ -136,12 +136,12 @@ def container(path):
                     folder_list.append(object)
             folders = folder_path.split('/')
             #Current folder's path
-            upload_path = container_name + '/'
+            current_path = container_name + '/'
             for folder in folders[:-1]:
-                upload_path += folder + '/'
+                current_path += folder + '/'
             
             return render_template('/swift/folder.html',
-                        upload_path = upload_path, 
+                        current_path = current_path, 
                         container_name=container_name,
                         folders=folders[:-1],
                         object_list=object_list,
@@ -183,9 +183,12 @@ def container(path):
 @login_required
 def bulk_delete():
     path = request.args.get('next')
-    checkbox_list = request.form.getlist("select_object_group")    
+    checkbox_object_list = request.form.getlist("select_object_group")    
     bulk_delete_body = ""
-    for checkbox in checkbox_list:
+    for checkbox in checkbox_object_list:
         bulk_delete_body += checkbox + '\n'
     swift_account.bulkDelete(bulk_delete_body)
+    checkbox_folder_list = request.form.getlist('select_folder_group')
+    for checkbox in checkbox_folder_list:
+        swift_account.deleteObject(checkbox)
     return redirect(url_for('swift.container', path=path))

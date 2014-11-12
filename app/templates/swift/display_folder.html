@@ -1,6 +1,11 @@
 <div class="col-md-2 col-sm-2 col-xs-5">
     <div class="thumbnail">
         <div class="bg-warning">
+            <center>
+            <label name="selectLabel" style="display:none";>
+            <input value="{{folder_path}}" type="checkbox" name="select_folder_group" />
+            </label>
+            </center>
             <a href="{{url_for('swift.container', path=folder_path)}}">
                 <img src="{{url_for('static', filename='images/swift/folder.png', _external=True)}}">
             </a>
