@@ -42,6 +42,8 @@ def login():
         if user is not None:
             if user.authenticateUser(password):
                 login_user(user)
+                if user.role is None:
+                    user.role = 'User'
                 return redirect(request.args.get('next') or url_for('swift.account'))
         flash('Invalid username or password.')
     return render_template('auth/login.html', form=form)

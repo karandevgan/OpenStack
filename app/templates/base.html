@@ -3,33 +3,7 @@
 
 {% block head %}
 {{ super() }}
-<style type="text/css">
-    html { 
-        height: 100%;
-    }
-    
-    body {
-        height: 100%;
-        padding-top: 70px;
-    }
-
-    /* Wrapper for page content to push down footer */
-    #wrap {
-        min-height: 100%;
-        height: auto;
-        /* Negative indent footer by its height */
-        margin: 0 auto -60px;
-        /* Pad bottom by footer height */
-        padding: 0 0 60px;
-    }
-
-    /* Set the fixed height of the footer here */
-    #footer {
-        height: 60px;
-        width: 100%;
-        background-color: #f5f5f5;
-  }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}" />
 {% endblock %}
 
 {% block scripts %}
@@ -59,6 +33,9 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated() %}
+                    {% if current_user.role == 'Admin' %}
+                    <li><a href="{{ url_for('swift.admin_mainpage') }}">Admin Panel</a></li>
+                    {% endif %}
                 <li class="dropdown">
                     <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
                         Account <b class="caret"></b>
@@ -95,7 +72,8 @@
 
 <div id="footer">
     <div class="container text-center">
-        <p class="text-muted">Developed by XenonLabs</p>
+        <br>
+        <p class="text-muted">Developed at XenonLabs</p>
     </div>
 </div>
 {% endblock %}

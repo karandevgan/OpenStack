@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}
+    XenonSwift | Admin Panel | Overview
+{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}" />
+{% endblock %}
+
+{% block page_content %}
+    <div class="row">
+        {% include "/swift/admin/sidebar.html" %}
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2">
+            <div class="panel panel-primary">
+            <div class="panel-heading"><h3>Overview</h3></div>
+            <div class="panel-body">
+            <h4>This page gives you the overview of your swift cluster like what version of swift you are using, what services 
+            are enabled in your cluster, its health status etc.</h4>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item"><b>Swift Version:</b> {{ swift_details.get('version') }}</li>
+                <li class="list-group-item"><b>Authentication Methods:</b>
+                    <ul>
+                        {% for method in authentication_methods %}<li>{{ method }}</li>{% endfor %}
+                    </ul>
+                </li>
+                <li class="list-group-item"><b>Other Services:</b> 
+                    <ul>
+                        {% for service in other_services %}<li>{{ service | capitalize }}</li>{% endfor %}
+                    </ul>
+                </li>
+                <li class="list-group-item"><b>Cluster Health Status:</b> {{ health_status }}</li>
+            </ul>
+        </div>
+    </div>
+    </div>
+{% endblock %}

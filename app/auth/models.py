@@ -15,6 +15,7 @@ class User(UserMixin, db.Model):
     first_name = db.Column(db.String(32))
     last_name = db.Column(db.String(32))
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+    role = db.Column(db.String(32), default="Users")
 
     def authenticateUser(self,password):
         url = current_app.config['IDENTITY_URL'] + '/tokens'

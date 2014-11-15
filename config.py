@@ -16,7 +16,7 @@ class Config:
     ADMIN_TOKEN = 'openstack'
     ADMIN_IDENTITY_URL_V3 = 'http://112.196.38.243:35357/v3'
 
-    SWIFT_URL = 'http://112.196.38.243:8080/v1'
+    SWIFT_URL = 'http://112.196.38.243:8080'
 
     #ID for 'users' tenant
     DEFAULT_DOMAIN_ID = "default"

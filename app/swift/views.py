@@ -9,6 +9,7 @@ from .models import Swift
 from time import time
 import hmac
 from hashlib import sha1
+from ..decorators import admin_required
 
 def calculateHMACSignature(hmacpath, timestamp, redirect_path, key):
     if key is None:
@@ -16,55 +17,9 @@ def calculateHMACSignature(hmacpath, timestamp, redirect_path, key):
     hmac_body = '%s\n%s\n%s\n%s\n%s' % (hmacpath, redirect_path, 1073741824, 1, timestamp)
     return hmac.new(key, hmac_body, sha1).hexdigest()
 
+swift_authentication_methods = {'keystoneauth': 'Keystone Authentication', 'tempauth': 'Temp Auth'}
+
 swift_account = Swift()
-
-@swift.route('/upload', methods=['GET', 'POST'])
-@login_required
-def upload():
-    secret_key_form = SetSecretKeyForm()
-
-    key = swift_account.getSecretKey()
-    if secret_key_form.validate_on_submit():
-        swift_account.setSecretKey(key=secret_key_form.key.data)
-        flash('Key has been updated')
-        return redirect(url_for('swift.upload', path=request.args.get('path')))
-
-    upload_path = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id') + \
-            '/' + request.args.get('path')
-    timestamp = int(time() + 600)
-    hmacpath = '/v1' + '/AUTH_' + session.get('current_project_id') + '/' + request.args.get('path')
-    redirect_path=url_for('swift.container', path=request.args.get('path') , _external=True)
-    hmackey = calculateHMACSignature(hmacpath, timestamp, redirect_path, key)
-    
-    return render_template('/swift/upload.html',
-                        upload_path=upload_path,
-                        redirect_path=redirect_path,
-                        timestamp = timestamp,
-                        hmackey = hmackey,
-                        has_key = bool(key),
-                        secret_key_form = secret_key_form)
-
-@swift.route('/create/container', methods=['GET', 'POST'])
-@login_required
-def create_container():
-    form = CreateContainerForm()
-    if form.validate_on_submit():
-        swift_account.createContainer(form.name.data)
-        flash('Container ' + form.name.data + ' has been created.')
-        return redirect(url_for('swift.account'))
-    return render_template('/swift/create_container.html', form=form)
-
-@swift.route('/create/folder', methods=['GET','POST'])
-@login_required
-def create_folder():
-    form = CreateFolderForm()
-    path = request.args.get('path')
-    if form.validate_on_submit():
-        upload_path = path + form.name.data + '/'
-        swift_account.createFolder(upload_path)
-        flash('Folder ' + form.name.data + ' has been created.')
-        return redirect(url_for('swift.container', path=path))
-    return render_template('/swift/create_folder.html', form=form)
 
 @swift.route('/')
 @login_required
@@ -161,16 +116,11 @@ def container(path):
         object_name = path[path.find('/')+1:]
         r = swift_account.getObject(container_name, object_name)
         filename = path[path.rfind('/')+1:]
-        # with open(filename, 'wb') as fd:
-        #     for chunk in r.iter_content():
-        #         fd.write(chunk)
-        # return redirect(url_for('swift.account'))
-        
-        #Make a generator so that all the content are not stored at once in memory
+
         def generate():
             for chunk in r.iter_lines():
                 yield chunk
-        # response = make_response(Response(stream_with_context(generate())))
+
         response = make_response(Response(generate()))
         response.headers['Content-Disposition'] = 'attachment; filename=' + filename
         response.headers['Content-Type'] = r.headers['Content-Type']
@@ -178,6 +128,57 @@ def container(path):
 
     #Else return error code 404
     abort(404)
+
+@swift.route('/upload', methods=['GET', 'POST'])
+@login_required
+def upload():
+    secret_key_form = SetSecretKeyForm()
+
+    key = swift_account.getSecretKey()
+    if secret_key_form.validate_on_submit():
+        swift_account.setSecretKey(key=secret_key_form.key.data)
+        flash('Key has been updated')
+        return redirect(url_for('swift.upload', path=request.args.get('path')))
+
+    upload_path = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id') + \
+            '/' + request.args.get('path')
+    timestamp = int(time() + 600)
+    hmacpath = '/v1' + '/AUTH_' + session.get('current_project_id') + '/' + request.args.get('path')
+    redirect_path=url_for('swift.container', path=request.args.get('path') , _external=True)
+    hmackey = calculateHMACSignature(hmacpath, timestamp, redirect_path, key)
+    
+    return render_template('/swift/upload.html',
+                        upload_path=upload_path,
+                        redirect_path=redirect_path,
+                        timestamp = timestamp,
+                        hmackey = hmackey,
+                        has_key = bool(key),
+                        secret_key_form = secret_key_form)
+
+@swift.route('/create/container', methods=['GET', 'POST'])
+@login_required
+def create_container():
+    form = CreateContainerForm()
+    if form.validate_on_submit():
+        if swift_account.getContainerMetadata(form.name.data):
+            flash('Container already exists.')
+        else:
+            swift_account.createContainer(form.name.data)
+            flash('Container ' + form.name.data + ' has been created.')
+            return redirect(url_for('swift.account'))
+    return render_template('/swift/create_container.html', form=form)
+
+@swift.route('/create/folder', methods=['GET','POST'])
+@login_required
+def create_folder():
+    form = CreateFolderForm()
+    path = request.args.get('path')
+    if form.validate_on_submit():
+        upload_path = path + form.name.data + '/'
+        swift_account.createFolder(upload_path)
+        flash('Folder ' + form.name.data + ' has been created.')
+        return redirect(url_for('swift.container', path=path))
+    return render_template('/swift/create_folder.html', form=form)
 
 @swift.route('/bulkdelete', methods=['GET', 'POST'])
 @login_required
@@ -192,3 +193,22 @@ def bulk_delete():
     for checkbox in checkbox_folder_list:
         swift_account.deleteObject(checkbox)
     return redirect(url_for('swift.container', path=path))
+
+
+@swift.route('/admin')
+@login_required
+@admin_required
+def admin_mainpage():
+    content = swift_account.getOverview()
+    health_status = swift_account.getHealthStatus()
+    swift_details = content.get('swift')
+    authentication_methods = [swift_authentication_methods.get(method) \
+        for method in content.keys() if method in swift_authentication_methods]
+    other_services = [service \
+        for service in content.keys() if not service in swift_authentication_methods and service != 'swift']
+    return render_template('/swift/admin/index.html', 
+        content=content, 
+        swift_details=swift_details, 
+        authentication_methods=authentication_methods, 
+        other_services=other_services,
+        health_status=health_status)

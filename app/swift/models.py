@@ -16,7 +16,7 @@ class Swift(object):
     }
 
     def getAccountInfo(self):
-        url = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id')
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id')
         headers = {'Accept': 'application/json', 'X-Auth-Token': session.get('user_token')}
         r = requests.get(url, headers=headers)
         if r.status_code == 204 or r.status_code == 200:
@@ -33,8 +33,18 @@ class Swift(object):
             return True
         abort(500)
 
+    def getContainerMetadata(self, container_name):
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + '/' + container_name
+        headers = {'X-Auth-Token': session.get('user_token')}
+        r = requests.head(url, headers=headers)
+        if r.status_code == 204:
+            return True
+        elif r.status_code == 404:
+            return False
+        abort(500)
+
     def getContainerInfo(self, container_name):
-        url = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id') + \
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + \
             '/' + str(container_name) + '?delimiter=/'
         headers = {'Accept': 'application/json', 'X-Auth-Token': session.get('user_token')}
         r = requests.get(url, headers=headers)
@@ -48,16 +58,16 @@ class Swift(object):
         abort(500)
 
     def createContainer(self, container_name):
-        url = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id') + \
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + \
             '/' + str(container_name)
         headers = {'X-Auth-Token': session.get('user_token')}
         r = requests.put(url, headers=headers)
         if r.status_code == 201 or r.status_code == 204:
             return
         abort(500)
-
+ 
     def deleteContainer(self,container_name):
-        url = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id') + \
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + \
             '/' + str(container_name)
         headers = {'X-Auth-Token': session.get('user_token')}
         r = requests.delete(url, headers=headers)
@@ -68,7 +78,6 @@ class Swift(object):
         if r.status_code == 404:
             abort(404)
         abort(500)
-
 
     def deleteObject(self,path):
         if path[-1] == '/':         #Its a folder, delete it using bulk delete
@@ -84,7 +93,7 @@ class Swift(object):
                 abort(404)
             return
 
-        url = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id') + \
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + \
             '/' + str(path)
         headers = {'X-Auth-Token': session.get('user_token')}
         r = requests.delete(url, headers=headers)
@@ -95,7 +104,7 @@ class Swift(object):
         abort(500)
 
     def getObject(self, container_name, object_name):
-        url = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id') + \
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + \
             '/' + str(container_name) + '/' + str(object_name)
         headers = {'X-Auth-Token': session.get('user_token')}
         #Streams the object i.e. does not get whole object at once
@@ -107,7 +116,7 @@ class Swift(object):
         abort(500)
 
     def openFolder(self,container_name, folder_path, use_delimiter=True):
-        url = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id') + \
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + \
             '/' + str(container_name) + '?prefix=' + str(folder_path)
         if use_delimiter:
             url += '&delimiter=/'
@@ -121,7 +130,7 @@ class Swift(object):
         abort(500)
 
     def createFolder(self, path):
-        url = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id') + \
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + \
             '/' + path
         headers = {'X-Auth-Token': session.get('user_token')}
         r = requests.put(url, headers=headers)
@@ -132,7 +141,7 @@ class Swift(object):
         abort(500)
 
     def setSecretKey(self, key):
-        url = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id')
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id')
         headers = {'X-Auth-Token': session.get('user_token'), 'X-Account-Meta-Temp-URL-Key': key}
         r = requests.post(url, headers=headers)
         if r.status_code == 204:
@@ -140,7 +149,7 @@ class Swift(object):
         abort(500)
 
     def getSecretKey(self):
-        url = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id')
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id')
         headers = {'X-Auth-Token': session.get('user_token')}
         r = requests.head(url, headers=headers)
         if r.status_code == 204:
@@ -150,9 +159,24 @@ class Swift(object):
         abort(500)
 
     def bulkDelete(self, bulk_delete_body):
-        url = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id') + '?bulk-delete=true'
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + '?bulk-delete=true'
         headers = {'X-Auth-Token': session.get('user_token'), 'Accept': 'application/json'}
         r = requests.delete(url, headers=headers, data=bulk_delete_body)
         if r.status_code == 200:
             return json.loads(r.content)
+        abort(500)
+
+    def getOverview(self):
+        url = current_app.config['SWIFT_URL'] + '/info'
+        headers = {'Accept': 'application/json'}
+        r = requests.get(url, headers=headers)
+        if r.status_code == 200:
+            return json.loads(r.content)
+        abort(500)
+
+    def getHealthStatus(self):
+        url = current_app.config['SWIFT_URL'] + '/healthcheck'
+        r = requests.get(url)
+        if r.status_code == 200:
+            return r.content
         abort(500)
