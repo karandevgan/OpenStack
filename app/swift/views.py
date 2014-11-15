@@ -140,7 +140,7 @@ def upload():
         flash('Key has been updated')
         return redirect(url_for('swift.upload', path=request.args.get('path')))
 
-    upload_path = current_app.config['SWIFT_URL'] + '/AUTH_' + session.get('current_project_id') + \
+    upload_path = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + \
             '/' + request.args.get('path')
     timestamp = int(time() + 600)
     hmacpath = '/v1' + '/AUTH_' + session.get('current_project_id') + '/' + request.args.get('path')
