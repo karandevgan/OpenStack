@@ -1,0 +1,41 @@
+{% extends "swift/admin/base.html" %}
+{% block title %}
+    XenonSwift | Admin Panel | Limits
+{% endblock %}
+
+{% block main_content %}
+<div class="panel panel-primary">
+    <div class="panel-heading"><h3>Limits</h3></div>
+    <div class="panel-body">
+    <h4>This page gives you the limits imposed on your swift cluster. Click on the Service to expand it.</h4>
+</div>
+    <div class="panel-group" id="accordion">
+        {% for key in content %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="{{'#collapse%s' % key}}">{{ key | capitalize }}</a>
+                </h4>
+            </div>
+            <div id="{{'collapse%s' % key}}" class="panel panel-collapse collapse">
+                <table class="table table-bordered">
+                    {% if content.get(key) %}
+                    {% for data in content.get(key) %}
+                    <tr>
+                        <td>{{data}}</td>
+                        <td>{{content.get(key).get(data)}}</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td>No data to show.</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

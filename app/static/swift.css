@@ -9,7 +9,7 @@
     top: 50px;
     bottom: 60px;
     left: 0;
-    z-index: 1000;
+    z-index: 0;
     display: block;
     padding: 20px;
     overflow-x: hidden;
@@ -36,4 +36,27 @@
 .nav-sidebar > .active > a:focus {
   color: #fff;
   background-color: #428bca;
+}
+
+.table-responsive {
+    width: 100%;
+    margin-bottom: 15px;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    border: 1px solid #ddd;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive>.table { 
+    margin-bottom: 0;
+}
+
+.table-responsive>.table>thead>tr>th, 
+.table-responsive>.table>tbody>tr>th, 
+.table-responsive>.table>tfoot>tr>th, 
+.table-responsive>.table>thead>tr>td, 
+.table-responsive>.table>tbody>tr>td, 
+.table-responsive>.table>tfoot>tr>td {
+    white-space: nowrap;
 }

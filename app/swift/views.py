@@ -197,7 +197,6 @@ def bulk_delete():
 
 
 @swift.route('/admin')
-@login_required
 @admin_required
 def admin_mainpage():
     content = swift_account.getOverview()
@@ -208,15 +207,19 @@ def admin_mainpage():
     other_services = [service \
         for service in content.keys() if not service in swift_authentication_methods and service != 'swift']
     return render_template('/swift/admin/index.html', 
-        content=content, 
         swift_details=swift_details, 
         authentication_methods=authentication_methods, 
         other_services=other_services,
         health_status=health_status)
 
 @swift.route('/admin/users')
-@login_required
 @admin_required
 def admin_list_users():
     users = User.query.all()
     return render_template('/swift/admin/users.html', users=users)
+
+@swift.route('/admin/limits')
+@admin_required
+def admin_limits():
+    content = swift_account.getOverview()
+    return render_template('/swift/admin/limits.html', content=content)
