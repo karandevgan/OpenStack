@@ -1,0 +1,46 @@
+{% extends "swift/admin/base.html" %}
+{% block title %}
+    XenonSwift | Admin Panel | Users
+{% endblock %}
+
+{% block head %}
+{{ super () }}
+<link rel="stylesheet" href="{{ url_for('static', filename='common.css') }}" />
+{% endblock %}
+
+{% block main_content %}
+<div class="panel panel-primary">
+    <div class="panel-heading"><h3>Users</h3></div>
+    <div class="panel-body">
+        <h4>This page lists the registered users of XenonSwift. You can modify user's details form the Edit button given with the field in the table.</h4>
+        <br><br>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <tr class="danger">
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Member Since</th>
+                    <th>Confirmed?</th>
+                    <th>Role</th>
+                </tr>
+
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.first_name }}</td>
+                    <td>{{ user.last_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ (user.member_since | string)[:11] }}</td>
+                    <td>{{ user.confirmed }}</td>
+                    <td>{{ user.role }}</td>
+                </tr>
+                {% endfor %}
+            </table> 
+        </div>   
+    </div>
+</div>
+{% endblock %}

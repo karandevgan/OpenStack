@@ -17,6 +17,9 @@ class User(UserMixin, db.Model):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     role = db.Column(db.String(32), default="Users")
 
+    def __repr__(self):
+        return '<User %r>' % self.username
+
     def authenticateUser(self,password):
         url = current_app.config['IDENTITY_URL'] + '/tokens'
         payload = {

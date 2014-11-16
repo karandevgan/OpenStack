@@ -6,6 +6,7 @@ from flask.ext.login import login_required, current_user
 from . import swift
 from .forms import CreateContainerForm, CreateFolderForm, SetSecretKeyForm
 from .models import Swift
+from ..auth.models import User
 from time import time
 import hmac
 from hashlib import sha1
@@ -212,3 +213,10 @@ def admin_mainpage():
         authentication_methods=authentication_methods, 
         other_services=other_services,
         health_status=health_status)
+
+@swift.route('/admin/users')
+@login_required
+@admin_required
+def admin_list_users():
+    users = User.query.all()
+    return render_template('/swift/admin/users.html', users=users)
