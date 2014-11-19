@@ -7,6 +7,7 @@ from .forms import LoginForm, RegistrationForm, ProfileForm
 from . import auth
 from .models import User
 from ..email import send_email
+from ..decorators import admin_required
 
 @auth.before_app_request
 def before_request():
@@ -39,12 +40,16 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         password = form.password.data
         if user is not None:
-            if user.authenticateUser(password):
-                login_user(user)
-                if user.role is None:
-                    user.role = 'User'
-                return redirect(request.args.get('next') or url_for('swift.account'))
-        flash('Invalid username or password.')
+            if user.enabled:
+                if user.authenticateUser(password):
+                    login_user(user)
+                    if user.role is None:
+                        user.role = 'User'
+                    return redirect(request.args.get('next') or url_for('swift.account'))
+                flash('Invalid username or password.')
+            else:
+                flash('You have been disabled. Kindly contact the administrator.')
+                return redirect(url_for('main.index'))
     return render_template('auth/login.html', form=form)
 
 @auth.route('/logout')
@@ -116,3 +121,21 @@ def profile():
     form.last_name.data = current_user.last_name
     form.email.data = current_user.email
     return render_template('auth/profile.html', form=form)
+
+@auth.route('/users')
+@admin_required
+def list_users():
+    users = User.query.all()
+    return render_template('/swift/admin/users.html', users=users)
+
+@auth.route('/admin/updateusers', methods=['GET','POST'])
+@admin_required
+def update_user():
+    username = request.args.get('user')
+    user = User.query.filter_by(username=username).first()
+    if user is not None:
+        role = request.form.get('role_' + username)
+        confirmed = request.form.get('confirmed_' + username )
+        enabled = request.form.get('enabled_' + username)
+        current_user.updateUser(user=user, role=role, confirmed=confirmed, enabled=enabled)
+    return redirect(url_for('auth.list_users'))

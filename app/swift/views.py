@@ -194,10 +194,9 @@ def bulk_delete():
         swift_account.deleteObject(checkbox)
     return redirect(url_for('swift.container', path=path))
 
-
-@swift.route('/admin')
+@swift.route('/overview')
 @admin_required
-def admin_mainpage():
+def overview():
     content = swift_account.getOverview()
     health_status = swift_account.getHealthStatus()
     swift_details = content.get('swift')
@@ -211,23 +210,8 @@ def admin_mainpage():
         other_services=other_services,
         health_status=health_status)
 
-@swift.route('/admin/users')
+@swift.route('/limits')
 @admin_required
-def admin_list_users():
-    users = swift_account.getUsers()
-    return render_template('/swift/admin/users.html', users=users)
-
-@swift.route('/admin/limits')
-@admin_required
-def admin_limits():
+def limits():
     content = swift_account.getOverview()
     return render_template('/swift/admin/limits.html', content=content)
-
-@swift.route('/admin/updateusers', methods=['GET','POST'])
-@admin_required
-def update_user():
-    username = request.args.get('user')
-    role = request.form.get('role_' + username)
-    confirmed = request.form.get('confirmed_' + username )
-    swift_account.updateUser(username=username, role=role, confirmed=confirmed)
-    return redirect(url_for('swift.admin_list_users'))

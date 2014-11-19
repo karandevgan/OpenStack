@@ -27,12 +27,13 @@
                     <th>Member Since</th>
                     <th>Confirmed?</th>
                     <th>Role given</th>
+                    <th>Enabled</th>
                     <th>Edit</th>
                 </tr>
 
                 
                 {% for user in users %}
-                <form method="POST" action="{{url_for('swift.update_user', user=user.username)}}">
+                <form method="POST" action="{{url_for('auth.update_user', user=user.username)}}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <tr>
                         <td>{{ user.id }}</td>
@@ -43,6 +44,7 @@
                         <td>{{ (user.member_since | string)[:11] }}</td>
                         <td name="edit-label">{{ user.confirmed }}</td>
                         <td name="edit-label">{{ user.role }}</td>
+                        <td name="edit-label">{{ user.enabled }}</td>
                         <td class="edit-control">
                             <select name="{{ 'confirmed_' + user.username }}">
                                 {% if user.confirmed %}
@@ -62,6 +64,17 @@
                                 {% else %}
                                 <option value="Users">Users</option>
                                 <option value="Admin" selected>Admin</option>
+                                {% endif %}
+                            </select>
+                        </td>
+                        <td class="edit-control">
+                            <select name="{{ 'enabled_' + user.username }}">
+                                {% if user.enabled %}
+                                <option value="True" selected>True</option>
+                                <option value="False">False</option>
+                                {% else %}
+                                <option value="True">True</option>
+                                <option value="False" selected>False</option>
                                 {% endif %}
                             </select>
                         </td>

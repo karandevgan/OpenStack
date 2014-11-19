@@ -16,6 +16,7 @@ class User(UserMixin, db.Model):
     last_name = db.Column(db.String(32))
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     role = db.Column(db.String(32), default="Users")
+    enabled = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -132,6 +133,12 @@ class User(UserMixin, db.Model):
         self.first_name = first_name
         self.last_name = last_name
         db.session.add(self)
+        db.session.commit()
+
+    def updateUser(self, user, role, confirmed, enabled):
+        user.confirmed = confirmed
+        user.enabled = enabled
+        db.session.add(user)
         db.session.commit()
 
 @login_manager.user_loader
