@@ -2,7 +2,18 @@
   display: none;
 }
 
+@media handheld{
+  .admin-mobile {
+    display: block;
+  }
+}
+
+
 @media (min-width: 768px) {
+  .admin-mobile {
+    display: none;
+  }
+
   .sidebar {
     height: auto;
     position: fixed;
@@ -17,7 +28,7 @@
     background-color: #f5f5f5;
     border-right: 1px solid #eee;
   }
-}
+
 
 /* Sidebar navigation */
 .nav-sidebar {
@@ -37,7 +48,7 @@
   color: #fff;
   background-color: #428bca;
 }
-
+}
 .table-responsive {
     width: 100%;
     margin-bottom: 15px;

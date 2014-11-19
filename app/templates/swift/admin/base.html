@@ -5,6 +5,13 @@
 {% endblock %}
 
 {% block page_content %}
+    <div class="row admin-mobile text-center">
+        <a href="{{ url_for('swift.admin_mainpage') }}">Overview</a> | 
+        <a href="{{ url_for('swift.admin_list_users') }}">Users</a> |
+        <a href="{{ url_for('swift.admin_limits') }}">Limits</a> |
+        <a href="#">Export</a>
+        <br><br>
+    </div>
     <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
