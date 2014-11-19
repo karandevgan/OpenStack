@@ -60,3 +60,7 @@
 .table-responsive>.table>tfoot>tr>td {
     white-space: nowrap;
 }
+
+.edit-control{
+    display: none;
+}

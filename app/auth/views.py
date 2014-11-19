@@ -7,7 +7,6 @@ from .forms import LoginForm, RegistrationForm, ProfileForm
 from . import auth
 from .models import User
 from ..email import send_email
-from .. import db
 
 @auth.before_app_request
 def before_request():
@@ -109,9 +108,7 @@ def unconfirmed():
 def profile():
     form = ProfileForm()
     if form.validate_on_submit():
-        current_user.first_name = form.first_name.data
-        current_user.last_name = form.last_name.data
-        db.session.add(current_user)
+        current_user.updateProfile(first_name=form.first_name.data, last_name=form.last_name.data)
         flash('Your profile has been updated.')
         return redirect(url_for('main.index'))
     form.username.data = current_user.username

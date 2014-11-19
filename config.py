@@ -23,7 +23,7 @@ class Config:
     #ID for _member_ role
     DEFAULT_MEMBER_ROLE = "9fe2ff9ee4384b1894a90878d3e92bab"
     #Default space provided for Object Storage
-    DEFAULT_OBJECT_STORE = 5368709120
+    DEFAULT_OBJECT_STORE = os.environ.get('DEFAULT_OBJECT_STORE') or 5368709120
 
     ADMIN = os.environ.get('OPENSTACK_ADMIN') or 'karan.dewgun@gmail.com'
 
@@ -40,16 +40,28 @@ class Config:
     def init_app(app):
         pass
 
+
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
                         'postgres://ljotzwznkfbbsj:fijRfOburSbGK_gNpg90_3Zmds@ec2-54-83-196-7.compute-1.amazonaws.com:5432/dan7osdgq6ca7r' or \
                         'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+    # @staticmethod
+    # def init_app(app):
+    #     pass
 
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SSL_DISABLE = os.environ.get('SSL_DISABLE')
+    # @classmethod
+    # def init_app(app):
+    #     Config.init_app(app)
+    #     import logging
+    #     from logging.handlers import RotatingFileHandler
+    #     file_handler = RotatingFileHandler('errors.log')
+    #     file_handler.setLevel(logging.NOTSET)
+    #     app.logger.addHandler(file_handler)
 
 config = {
     'development': DevelopmentConfig,

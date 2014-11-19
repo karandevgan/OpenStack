@@ -1,6 +1,13 @@
 {% extends "swift/admin/base.html" %}
+{% import "macros.html" as macros %}
+
 {% block title %}
     XenonSwift | Admin Panel | Users
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script src="{{url_for('static', filename='admin-users.js')}}"></script>
 {% endblock %}
 
 {% block main_content %}
@@ -19,23 +26,55 @@
                     <th>Email</th>
                     <th>Member Since</th>
                     <th>Confirmed?</th>
-                    <th>Role</th>
+                    <th>Role given</th>
+                    <th>Edit</th>
                 </tr>
 
+                
                 {% for user in users %}
-                <tr>
-                    <td>{{ user.id }}</td>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.first_name }}</td>
-                    <td>{{ user.last_name }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ (user.member_since | string)[:11] }}</td>
-                    <td>{{ user.confirmed }}</td>
-                    <td>{{ user.role }}</td>
-                </tr>
+                <form method="POST" action="{{url_for('swift.update_user', user=user.username)}}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.first_name }}</td>
+                        <td>{{ user.last_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ (user.member_since | string)[:11] }}</td>
+                        <td name="edit-label">{{ user.confirmed }}</td>
+                        <td name="edit-label">{{ user.role }}</td>
+                        <td class="edit-control">
+                            <select name="{{ 'confirmed_' + user.username }}">
+                                {% if user.confirmed %}
+                                <option value="True" selected>True</option>
+                                <option value="False">False</option>
+                                {% else %}
+                                <option value="True">True</option>
+                                <option value="False" selected>False</option>
+                                {% endif %}
+                            </select>
+                        </td>
+                        <td class="edit-control">
+                            <select name="{{ 'role_' + user.username }}">
+                                {% if user.role == 'Users' %}
+                                <option value="Users" selected>Users</option>
+                                <option value="Admin">Admin</option>
+                                {% else %}
+                                <option value="Users">Users</option>
+                                <option value="Admin" selected>Admin</option>
+                                {% endif %}
+                            </select>
+                        </td>
+                        <td><a href="javascript:void();" onclick="editField(this)">Edit</a></td>
+                        <td class="edit-control">
+                            <input type="submit" value="Update" /> |
+                            <a href="javascript:void();" onclick="cancelField(this);">Cancel</a>
+                        </td>
+                    </tr>
+                </form>
                 {% endfor %}
             </table> 
-        </div>   
+        </div>
     </div>
 </div>
 {% endblock %}

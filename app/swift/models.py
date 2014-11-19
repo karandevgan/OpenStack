@@ -1,6 +1,8 @@
 from flask import current_app, abort, session
 import requests
 import json
+from .. import db
+from ..auth.models import User
 from contextlib import closing
 
 class Swift(object):
@@ -180,3 +182,13 @@ class Swift(object):
         if r.status_code == 200:
             return r.content
         abort(500)
+
+    def getUsers(self):
+        return User.query.all()
+    
+    def updateUser(self, username, role, confirmed):
+        user = User.query.filter_by(username=username).first()
+        if user is not None:
+            user.confirmed = confirmed
+            db.session.add(user)
+            db.session.commit()

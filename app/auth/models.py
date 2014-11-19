@@ -128,6 +128,12 @@ class User(UserMixin, db.Model):
         db.session.commit()
         return True
 
+    def updateProfile(self, first_name, last_name):
+        self.first_name = first_name
+        self.last_name = last_name
+        db.session.add(self)
+        db.session.commit()
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.filter_by(id=user_id).first()

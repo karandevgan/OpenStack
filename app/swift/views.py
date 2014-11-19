@@ -6,7 +6,6 @@ from flask.ext.login import login_required, current_user
 from . import swift
 from .forms import CreateContainerForm, CreateFolderForm, SetSecretKeyForm
 from .models import Swift
-from ..auth.models import User
 from time import time
 import hmac
 from hashlib import sha1
@@ -215,7 +214,7 @@ def admin_mainpage():
 @swift.route('/admin/users')
 @admin_required
 def admin_list_users():
-    users = User.query.all()
+    users = swift_account.getUsers()
     return render_template('/swift/admin/users.html', users=users)
 
 @swift.route('/admin/limits')
@@ -223,3 +222,12 @@ def admin_list_users():
 def admin_limits():
     content = swift_account.getOverview()
     return render_template('/swift/admin/limits.html', content=content)
+
+@swift.route('/admin/updateusers', methods=['GET','POST'])
+@admin_required
+def update_user():
+    username = request.args.get('user')
+    role = request.form.get('role_' + username)
+    confirmed = request.form.get('confirmed_' + username )
+    swift_account.updateUser(username=username, role=role, confirmed=confirmed)
+    return redirect(url_for('swift.admin_list_users'))
