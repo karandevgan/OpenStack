@@ -141,6 +141,21 @@ class User(UserMixin, db.Model):
         db.session.add(user)
         db.session.commit()
 
+        url = current_app.config['ADMIN_IDENTITY_URL'] + '/users/' + user.id
+        payload = {
+            "user": {
+                "enabled": user.enabled
+            }
+        }
+
+        headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 
+                'X-Auth-Token': current_app.config['ADMIN_TOKEN']}
+        data = json.dumps(payload)
+        r = requests.put(url, data=data, headers=headers)
+        if r.status_code == 200:
+            return
+        abort(500)
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.filter_by(id=user_id).first()
