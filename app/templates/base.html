@@ -33,7 +33,7 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated() %}
-                    {% if current_user.role == 'Admin' %}
+                    {% if (current_user.role | string) == 'Admin' %}
                     <li><a href="{{ url_for('swift.overview') }}">Admin Panel</a></li>
                     {% endif %}
                 <li class="dropdown">

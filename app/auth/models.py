@@ -6,6 +6,16 @@ import json
 from datetime import datetime
 from .. import db,login_manager
 
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.String(64), primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    users = db.relationship('User', backref='role', lazy='dynamic')
+
+    def __repr__(self):
+        return '%s' % self.name
+
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.String(64), primary_key=True)
@@ -15,11 +25,16 @@ class User(UserMixin, db.Model):
     first_name = db.Column(db.String(32))
     last_name = db.Column(db.String(32))
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
-    role = db.Column(db.String(32), default="Users")
+    role_id = db.Column(db.String(64), db.ForeignKey('roles.id'))
     enabled = db.Column(db.Boolean, default=True)
 
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.role is None:
+            self.role = Role.query.filter_by(name='Users').first()
+
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '%s' % self.username
 
     def authenticateUser(self,password):
         url = current_app.config['IDENTITY_URL'] + '/tokens'
@@ -138,6 +153,10 @@ class User(UserMixin, db.Model):
     def updateUser(self, user, role, confirmed, enabled):
         user.confirmed = confirmed
         user.enabled = enabled
+        role = Role.query.filter_by(name=str(role)).first()
+        if role is None:
+            abort(500)
+        user.role = role
         db.session.add(user)
         db.session.commit()
 

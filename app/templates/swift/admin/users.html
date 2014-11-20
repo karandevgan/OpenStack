@@ -58,7 +58,7 @@
                         </td>
                         <td class="edit-control">
                             <select name="{{ 'role_' + user.username }}">
-                                {% if user.role == 'Users' %}
+                                {% if (user.role | string) == 'Users' %}
                                 <option value="Users" selected>Users</option>
                                 <option value="Admin">Admin</option>
                                 {% else %}

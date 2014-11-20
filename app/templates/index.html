@@ -3,10 +3,12 @@
 {% block title %}XenonSwift | Index{% endblock %}
 
 {% block page_content %}
-    <div class="page-header">
-        <h1>
-            Hello, {% if current_user.is_authenticated() %}{{ current_user.first_name }}
-            {% else %}Stranger{% endif %}!
-        </h1>
+    <div class="jumbotron">
+        <h1>Hello Buddy!</h1>
+        <p>Welcome to XenonSwift.</p>
+        <p>XenonSwift allows you to create backups of photos, videos, documents and so on, and also can be used as archive storage.</p>
+        <p>Sign Up today and get 5 GB of free storage space.</p>
+        <br>
+        <p><a class="btn btn-primary btn-lg" role="button" href="{{url_for('auth.register')}}">Sign Up</a></p>
     </div>
 {% endblock %}

@@ -34,6 +34,8 @@ def before_app_request():
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated():
+        return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
         #Checks whether the user is present in local database or not
