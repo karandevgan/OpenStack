@@ -175,9 +175,12 @@ def create_folder():
     path = request.args.get('path')
     if form.validate_on_submit():
         upload_path = path + form.name.data + '/'
-        swift_account.createFolder(upload_path)
-        flash('Folder ' + form.name.data + ' has been created.')
-        return redirect(url_for('swift.container', path=path))
+        if swift_account.folderExists(upload_path):
+            flash('Folder already exists.')
+        else:
+            swift_account.createFolder(upload_path)
+            flash('Folder ' + form.name.data + ' has been created.')
+            return redirect(url_for('swift.container', path=path))
     return render_template('/swift/create_folder.html', form=form)
 
 @swift.route('/bulkdelete', methods=['GET', 'POST'])

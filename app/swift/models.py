@@ -131,6 +131,19 @@ class Swift(object):
             abort(404)
         abort(500)
 
+    def folderExists(self, path):
+        container_name = path[:path.find('/')]
+        folder_path = path[path.find('/')+1:]
+        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + \
+            '/' + container_name + '?prefix=' + folder_path + '&delimiter=/'
+        headers = {'Accept': 'application/json', 'X-Auth-Token': session.get('user_token')}
+        r = requests.get(url, headers=headers)
+        data = json.loads(r.content)
+        if r.status_code == 200 and len(data):
+            return True
+        if r.status_code == 404 or len(data)==0:
+            return False
+
     def createFolder(self, path):
         url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + \
             '/' + path
