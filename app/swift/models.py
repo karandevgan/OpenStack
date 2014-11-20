@@ -62,7 +62,8 @@ class Swift(object):
     def createContainer(self, container_name):
         url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + \
             '/' + str(container_name)
-        headers = {'X-Auth-Token': session.get('user_token')}
+        headers = {'X-Auth-Token': session.get('user_token'), 
+            'X-Container-Meta-Quota-Count': current_app.config['CONTAINER_META_COUNT']}
         r = requests.put(url, headers=headers)
         if r.status_code == 201 or r.status_code == 204:
             return

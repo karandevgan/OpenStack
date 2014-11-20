@@ -25,7 +25,7 @@
     padding: 20px;
     overflow-x: hidden;
     overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    background-color: #f5f5f5;
+    background-color: #428bca;
     border-right: 1px solid #eee;
   }
 
@@ -38,17 +38,18 @@
 }
 
 .nav-sidebar > li > a {
+  color: #ffffff;
   padding-right: 20px;
   padding-left: 20px;
 }
 
-.nav-sidebar > .active > a,
-.nav-sidebar > .active > a:hover,
-.nav-sidebar > .active > a:focus {
-  color: #fff;
-  background-color: #428bca;
+.nav-sidebar > li > a:hover,
+.nav-sidebar > li > a:active,
+.nav-sidebar > li > a:focus {
+  color: #000000;
 }
 }
+
 .table-responsive {
     width: 100%;
     margin-bottom: 15px;
