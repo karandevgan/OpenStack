@@ -4,7 +4,7 @@ from flask import render_template, redirect, \
     make_response
 from flask.ext.login import login_required, current_user
 from . import swift
-from .forms import CreateContainerForm, CreateFolderForm, SetSecretKeyForm
+from .forms import CreateContainerForm, CreateFolderForm
 from .models import Swift
 from time import time
 import hmac
@@ -12,10 +12,12 @@ from hashlib import sha1
 from ..decorators import admin_required
 from ..admin import readFile
 
-def calculateHMACSignature(hmacpath, timestamp, redirect_path, key):
-    if key is None:
-        return None
+def calculateHMACSignatureUpload(hmacpath, timestamp, redirect_path, key):
     hmac_body = '%s\n%s\n%s\n%s\n%s' % (hmacpath, redirect_path, 1073741824, 1, timestamp)
+    return hmac.new(key, hmac_body, sha1).hexdigest()
+
+def calculateHMACSignatureShare(hmacpath, expires, method, key):
+    hmac_body = '%s\n%s\n%s' % (method, expires, hmacpath)
     return hmac.new(key, hmac_body, sha1).hexdigest()
 
 swift_authentication_methods = {'keystoneauth': 'Keystone Authentication', 'tempauth': 'Temp Auth'}
@@ -133,28 +135,41 @@ def container(path):
 @swift.route('/upload', methods=['GET', 'POST'])
 @login_required
 def upload():
-    secret_key_form = SetSecretKeyForm()
-
     key = swift_account.getSecretKey()
-    if secret_key_form.validate_on_submit():
-        swift_account.setSecretKey(key=secret_key_form.key.data)
-        flash('Key has been updated')
-        return redirect(url_for('swift.upload', path=request.args.get('path')))
-
-    upload_path = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id') + \
-            '/' + request.args.get('path')
+    hmacpath = '/v1/AUTH_' + session.get('current_project_id') + '/' + request.args.get('path')
+    upload_path = current_app.config['SWIFT_URL'] + hmacpath
     timestamp = int(time() + 600)
-    hmacpath = '/v1' + '/AUTH_' + session.get('current_project_id') + '/' + request.args.get('path')
     redirect_path=url_for('swift.container', path=request.args.get('path') , _external=True)
-    hmackey = calculateHMACSignature(hmacpath, timestamp, redirect_path, key)
+    hmackey = calculateHMACSignatureUpload(hmacpath, timestamp, redirect_path, key)
     
     return render_template('/swift/upload.html',
                         upload_path=upload_path,
                         redirect_path=redirect_path,
                         timestamp = timestamp,
                         hmackey = hmackey,
-                        has_key = bool(key),
-                        secret_key_form = secret_key_form)
+                        has_key = bool(key))
+
+@swift.route('/share', methods=['GET', 'POST'])
+@login_required
+def share():
+    import bitly_api
+
+    object_path = request.args.get('path')
+    method = 'GET'
+    duration_for_seconds = 60*60*24
+    expires = int(time() + duration_for_seconds)
+    hmacpath = '/v1/AUTH_' + session.get('current_project_id') + '/' + object_path
+    key = swift_account.getSecretKey()
+    hmackey = calculateHMACSignatureShare(hmacpath, expires, method, key)
+
+    shared_url = current_app.config['SWIFT_URL'] + hmacpath + '?temp_url_sig=' + hmackey + '&temp_url_expires=' + str(expires)
+    b = bitly_api.Connection(current_app.config['BITLY_USERNAME'], current_app.config['BITLY_APIKEY'])
+    bitlyURL = b.shorten(shared_url)
+
+    
+    flash('URL for object (Valid for 24 Hours): %s' % bitlyURL.get('url'))
+    return redirect(url_for('swift.container', path=object_path[:object_path.rfind('/')+1]))
+
 
 @swift.route('/create/container', methods=['GET', 'POST'])
 @login_required

@@ -27,8 +27,16 @@ class Swift(object):
                 self.Account['number_of_objects'] = r.headers['X-Account-Object-Count']
                 self.Account['total_size'] = float(r.headers['X-Account-Bytes-Used'])
             if not r.headers.get('X-Account-Meta-Quota-Bytes'):
-                headers2 = {'X-Auth-Token': session.get('user_token'),
-                        'X-Account-Meta-Quota-Bytes': current_app.config['DEFAULT_OBJECT_STORE']}
+                if not r.headers.get('X-Account-Meta-Temp-URL-Key'):
+                    import random
+                    import string
+                    random_key = ''.join([random.choice(string.ascii_lowercase + string.digits) for n in xrange(32)])
+                    headers2 = {'X-Auth-Token': session.get('user_token'),
+                            'X-Account-Meta-Quota-Bytes': current_app.config['DEFAULT_OBJECT_STORE'],
+                            'X-Account-Meta-Temp-URL-Key': random_key}
+                else:
+                    headers2 = {'X-Auth-Token': session.get('user_token'),
+                                'X-Account-Meta-Quota-Bytes': current_app.config['DEFAULT_OBJECT_STORE']}
                 r2 = requests.post(url, headers=headers2)
                 if r2.status_code != 200 and r2.status_code != 204:
                     abort(500)
@@ -154,14 +162,6 @@ class Swift(object):
             return
         if r.status_code == 404:
             abort(404)
-        abort(500)
-
-    def setSecretKey(self, key):
-        url = current_app.config['SWIFT_URL'] + '/v1/AUTH_' + session.get('current_project_id')
-        headers = {'X-Auth-Token': session.get('user_token'), 'X-Account-Meta-Temp-URL-Key': key}
-        r = requests.post(url, headers=headers)
-        if r.status_code == 204:
-            return r.headers.get('X-Account-Meta-Temp-URL-Key')
         abort(500)
 
     def getSecretKey(self):

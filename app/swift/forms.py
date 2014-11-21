@@ -13,7 +13,3 @@ class CreateFolderForm(Form):
     name = StringField('Folder Name', validators=[Required(), Length(1,20), Regexp("^[ A-Za-z0-9_]*$", 
                                                 message="Only alphanumeric characters, space and underscores are allowed")])
     submit = SubmitField('Submit')
-
-class SetSecretKeyForm(Form):
-    key = StringField('Key', validators=[Required(), Length(5,10)])
-    submit = SubmitField('Submit')

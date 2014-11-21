@@ -37,6 +37,9 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
+    BITLY_USERNAME = 'xenonswift'
+    BITLY_APIKEY = 'R_d9c3298302834b5d9cef402d78270c4e'
+
     SSL_DISABLE =  True
     
     @staticmethod
