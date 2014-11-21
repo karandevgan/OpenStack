@@ -24,7 +24,7 @@
     {% set account_size = Account.get('total_size') %}
     {% set progress_value = (account_size / 5368709120) * 100 %}
     <div>
-        <p> Total space used: {{progress_value|int}}%</p>
+        <p> Total space used: {{progress_value|int}}% </p>
         <div class="progress">
             <div class="progress-bar" role="progressbar" aria-valuenow="{{progress_value}}" aria-valuemin="0" aria-valuemax="100"
             style="width: {{progress_value}}%;">
@@ -60,8 +60,8 @@
                     </div>
                 </div>
                 <div class="row">
+                    {% set i = 0 %}
                     {% for container in Account.get('containers') %}
-                        {% set i = 0 %}
                         {% set i = i+1 %}
                         {% include "swift/display_container.html" %}
                         {% include "swift/container_modal.html" %}
