@@ -11,12 +11,12 @@ class Config:
     #Clears the session after 30 seconds of inactivity
     PERMANENT_SESSION_LIFETIME = timedelta(seconds=3000)
 
-    IDENTITY_URL = 'http://112.196.38.243:5000/v2.0'
-    ADMIN_IDENTITY_URL = 'http://112.196.38.243:35357/v2.0'
+    IDENTITY_URL = 'http://112.196.38.244:5000/v2.0'
+    ADMIN_IDENTITY_URL = 'http://112.196.38.244:35357/v2.0'
     ADMIN_TOKEN = 'openstack'
-    ADMIN_IDENTITY_URL_V3 = 'http://112.196.38.243:35357/v3'
+    ADMIN_IDENTITY_URL_V3 = 'http://112.196.38.244:35357/v3'
 
-    SWIFT_URL = 'http://112.196.38.243:8080'
+    SWIFT_URL = 'http://112.196.38.244:8080'
 
     #ID for 'users' tenant
     DEFAULT_DOMAIN_ID = "default"
