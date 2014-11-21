@@ -10,6 +10,7 @@ from time import time
 import hmac
 from hashlib import sha1
 from ..decorators import admin_required
+from ..admin import readFile
 
 def calculateHMACSignature(hmacpath, timestamp, redirect_path, key):
     if key is None:
@@ -218,3 +219,15 @@ def overview():
 def limits():
     content = swift_account.getOverview()
     return render_template('/swift/admin/limits.html', content=content)
+
+@swift.route('/errors', methods=['GET', 'POST'])
+@admin_required
+def listErrors():
+    import os
+    from .. import basedir
+    n = request.form.get('linestxt')
+    if n is None:
+        n = 10
+    filename = os.path.join(basedir, 'errors.log')
+    lines = readFile(path=filename, n=n)
+    return render_template('/swift/admin/errors.html', lines=lines)

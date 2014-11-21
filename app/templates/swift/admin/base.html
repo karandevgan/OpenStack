@@ -9,7 +9,7 @@
         <a href="{{ url_for('swift.overview') }}">Overview</a> | 
         <a href="{{ url_for('auth.list_users') }}">Users</a> |
         <a href="{{ url_for('swift.limits') }}">Limits</a> |
-        <a href="{{ url_for('static', filename='errors.log') }}">Logs</a>
+        <a href="{{ url_for('swift.listErrors') }}">Logs</a>
         <br><br>
     </div>
     <div class="row">
@@ -18,7 +18,7 @@
             <li><a href="{{ url_for('swift.overview') }}">Overview</a></li>
             <li><a href="{{ url_for('auth.list_users') }}">Users</a></li>
             <li><a href="{{ url_for('swift.limits') }}">Limits</a></li>
-            <li><a href="{{ url_for('static', filename='errors.log') }}">Logs</a></li>
+            <li><a href="{{ url_for('swift.listErrors') }}">Logs</a></li>
           </ul>
         </div>
 

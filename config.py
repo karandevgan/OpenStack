@@ -50,6 +50,16 @@ class DevelopmentConfig(Config):
                         'postgres://ljotzwznkfbbsj:fijRfOburSbGK_gNpg90_3Zmds@ec2-54-83-196-7.compute-1.amazonaws.com:5432/dan7osdgq6ca7r' or \
                         'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
 
+    @staticmethod
+    def init_app(app):
+        Config.init_app(app)
+        import logging
+        from logging.handlers import RotatingFileHandler
+        file_name = os.path.join(basedir, 'app/errors.log')
+        file_handler = RotatingFileHandler(file_name)
+        file_handler.setLevel(logging.NOTSET)
+        app.logger.addHandler(file_handler)
+
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SSL_DISABLE = os.environ.get('SSL_DISABLE')
@@ -59,7 +69,8 @@ class ProductionConfig(Config):
         Config.init_app(app)
         import logging
         from logging.handlers import RotatingFileHandler
-        file_handler = RotatingFileHandler('app/static/errors.log')
+        file_name = os.path.join(basedir,  'app/errors.log')
+        file_handler = RotatingFileHandler(file_name)
         file_handler.setLevel(logging.NOTSET)
         app.logger.addHandler(file_handler)
 

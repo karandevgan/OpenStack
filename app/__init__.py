@@ -6,6 +6,9 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from config import config
 from flask_wtf.csrf import CsrfProtect
 
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 bootstrap = Bootstrap()
 mail = Mail()
 db = SQLAlchemy()
