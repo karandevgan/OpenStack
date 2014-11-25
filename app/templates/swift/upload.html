@@ -48,7 +48,6 @@
 </div>
 
 <div class="col-md-6">
-    {% if has_key %}
     <form role="form" id="upload_file" method="post" action='{{upload_path}}' enctype="multipart/form-data"
         onsubmit="return checkFile();">
         <div class="form-group">
@@ -68,13 +67,12 @@
         <div class="form-group">
             <label for="file">Select a file</label>
             <input id="file" name="file" type="file" class="form-control" />
-            <p class="help-block">File size should not be greater than 1 GB.<br>
+            <p class="help-block">
+            Please make sure you already don't have another file of same name. Otherwise, it will be replaced.<br>
+            File size should not be greater than 1 GB.<br>
             Direct upload of executable files is not allowed.</p>
         </div>
             <button id="submit" type="submit" class="btn btn-danger">Submit</button>
     </form>
-    {% else %}
-        <p>Please Set Key First!</p>
-    {% endif %}
 </div>
 {% endblock %}

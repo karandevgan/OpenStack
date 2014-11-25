@@ -153,10 +153,19 @@ def upload():
 @login_required
 def share():
     import bitly_api
-
     object_path = request.args.get('path')
     method = 'GET'
-    duration_for_seconds = 60*60*24
+    duration_for_seconds = 24 * 60 * 60
+    # duration = request.form.get('shareTime')
+    # print duration
+    # if duration == "30 minutes":
+    #     duration_for_seconds = 30 * 60
+    # elif duration == "1 hour":
+    #     duration_for_seconds = 60 * 60
+    # elif duration == "24 hours":
+    #     duration_for_seconds = 24 * 60 * 60
+    # else:
+    #     duration_for_seconds = 365 * 24 * 60 * 60
     expires = int(time() + duration_for_seconds)
     hmacpath = '/v1/AUTH_' + session.get('current_project_id') + '/' + object_path
     key = swift_account.getSecretKey()
